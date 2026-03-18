@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-config
+data:
+  MYSQL_HOST: "db"
+  MYSQL_USER: "root"
+  MYSQL_DATABASE: "devops_app"
+  MYSQL_PORT: "3306"

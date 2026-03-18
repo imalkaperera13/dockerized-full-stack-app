@@ -3,7 +3,7 @@ async function loadProducts() {
   productList.innerHTML = "<li>Loading...</li>";
 
   try {
-    const response = await fetch("http://localhost:5000/api/products");
+    const response = await fetch("http://localhost:5000/api/products"); 
     const products = await response.json();
 
     productList.innerHTML = "";
@@ -17,4 +17,4 @@ async function loadProducts() {
     productList.innerHTML = "<li>Failed to load products</li>";
     console.error(error);
   }
-}
+} 
