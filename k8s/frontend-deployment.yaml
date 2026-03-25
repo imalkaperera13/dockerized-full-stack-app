@@ -17,3 +17,5 @@ spec:
           image: imalka13/dockerized-full-stack-app-frontend:latest
           ports:
             - containerPort: 80
+image: imalka13/dockerized-full-stack-app-frontend:latest
+imagePullPolicy: Always

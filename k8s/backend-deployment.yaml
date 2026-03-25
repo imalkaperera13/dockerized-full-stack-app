@@ -44,3 +44,6 @@ env:
       secretKeyRef:
         name: mysql-secret
         key: MYSQL_ROOT_PASSWORD
+
+    image: imalka13/dockerized-full-stack-app:latest
+    imagePullPolicy: Always
