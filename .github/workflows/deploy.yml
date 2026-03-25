@@ -38,18 +38,20 @@ jobs:
           docker push imalka13/dockerized-full-stack-app-frontend:latest
           docker push imalka13/dockerized-full-stack-app-frontend:$env:TAG
 
-      - name: Restart Kubernetes deployments
+      - name: Deploy new version
         shell: powershell
         run: |
-          kubectl rollout restart deployment/backend-deployment
-          kubectl rollout restart deployment/frontend-deployment
-          kubectl rollout restart deployment/backend-deployment -n staging
-          kubectl rollout restart deployment/frontend-deployment -n staging
+          kubectl set image deployment/backend-deployment backend=imalka13/dockerized-full-stack-app:$env:TAG
+          kubectl set image deployment/frontend-deployment frontend=imalka13/dockerized-full-stack-app-frontend:$env:TAG
+
+          kubectl set image deployment/backend-deployment backend=imalka13/dockerized-full-stack-app:$env:TAG -n staging
+          kubectl set image deployment/frontend-deployment frontend=imalka13/dockerized-full-stack-app-frontend:$env:TAG -n staging
 
       - name: Wait for rollout
         shell: powershell
         run: |
           kubectl rollout status deployment/backend-deployment
           kubectl rollout status deployment/frontend-deployment
+
           kubectl rollout status deployment/backend-deployment -n staging
           kubectl rollout status deployment/frontend-deployment -n staging
