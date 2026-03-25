@@ -15,7 +15,20 @@ spec:
       containers:
         - name: frontend
           image: imalka13/dockerized-full-stack-app-frontend:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
-image: imalka13/dockerized-full-stack-app-frontend:latest
-imagePullPolicy: Always
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 10
+
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5

@@ -18,32 +18,44 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 5000
-env:
-  - name: MYSQL_HOST
-    valueFrom:
-      configMapKeyRef:
-        name: backend-config
-        key: MYSQL_HOST
-  - name: MYSQL_USER
-    valueFrom:
-      configMapKeyRef:
-        name: backend-config
-        key: MYSQL_USER
-  - name: MYSQL_DATABASE
-    valueFrom:
-      configMapKeyRef:
-        name: backend-config
-        key: MYSQL_DATABASE
-  - name: MYSQL_PORT
-    valueFrom:
-      configMapKeyRef:
-        name: backend-config
-        key: MYSQL_PORT
-  - name: MYSQL_ROOT_PASSWORD
-    valueFrom:
-      secretKeyRef:
-        name: mysql-secret
-        key: MYSQL_ROOT_PASSWORD
 
-    image: imalka13/dockerized-full-stack-app:latest
-    imagePullPolicy: Always
+          env:
+            - name: MYSQL_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: MYSQL_HOST
+            - name: MYSQL_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: MYSQL_USER
+            - name: MYSQL_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: MYSQL_DATABASE
+            - name: MYSQL_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: backend-config
+                  key: MYSQL_PORT
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_ROOT_PASSWORD
+
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 5000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 5000
+            initialDelaySeconds: 5
+            periodSeconds: 5

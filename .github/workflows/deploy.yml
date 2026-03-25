@@ -12,25 +12,37 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set image tag
+        id: vars
+        run: echo "TAG=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
       - name: Docker login
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build backend image
         run: |
           docker build -t imalka13/dockerized-full-stack-app:latest ./backend
+          docker build -t imalka13/dockerized-full-stack-app:${TAG} ./backend
           docker push imalka13/dockerized-full-stack-app:latest
+          docker push imalka13/dockerized-full-stack-app:${TAG}
 
       - name: Build frontend image
         run: |
           docker build -t imalka13/dockerized-full-stack-app-frontend:latest ./frontend
+          docker build -t imalka13/dockerized-full-stack-app-frontend:${TAG} ./frontend
           docker push imalka13/dockerized-full-stack-app-frontend:latest
+          docker push imalka13/dockerized-full-stack-app-frontend:${TAG}
 
       - name: Restart Kubernetes deployments
         run: |
           kubectl rollout restart deployment/backend-deployment
           kubectl rollout restart deployment/frontend-deployment
+          kubectl rollout restart deployment/backend-deployment -n staging
+          kubectl rollout restart deployment/frontend-deployment -n staging
 
       - name: Wait for rollout
         run: |
           kubectl rollout status deployment/backend-deployment
           kubectl rollout status deployment/frontend-deployment
+          kubectl rollout status deployment/backend-deployment -n staging
+          kubectl rollout status deployment/frontend-deployment -n staging
