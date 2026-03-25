@@ -13,27 +13,33 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set image tag
-        id: vars
-        run: echo "TAG=${GITHUB_SHA::7}" >> $GITHUB_ENV
+        shell: powershell
+        run: |
+          $shortSha = "${env:GITHUB_SHA}".Substring(0,7)
+          "TAG=$shortSha" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Docker login
+        shell: powershell
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build backend image
+      - name: Build and push backend image
+        shell: powershell
         run: |
           docker build -t imalka13/dockerized-full-stack-app:latest ./backend
-          docker build -t imalka13/dockerized-full-stack-app:${TAG} ./backend
+          docker build -t imalka13/dockerized-full-stack-app:$env:TAG ./backend
           docker push imalka13/dockerized-full-stack-app:latest
-          docker push imalka13/dockerized-full-stack-app:${TAG}
+          docker push imalka13/dockerized-full-stack-app:$env:TAG
 
-      - name: Build frontend image
+      - name: Build and push frontend image
+        shell: powershell
         run: |
           docker build -t imalka13/dockerized-full-stack-app-frontend:latest ./frontend
-          docker build -t imalka13/dockerized-full-stack-app-frontend:${TAG} ./frontend
+          docker build -t imalka13/dockerized-full-stack-app-frontend:$env:TAG ./frontend
           docker push imalka13/dockerized-full-stack-app-frontend:latest
-          docker push imalka13/dockerized-full-stack-app-frontend:${TAG}
+          docker push imalka13/dockerized-full-stack-app-frontend:$env:TAG
 
       - name: Restart Kubernetes deployments
+        shell: powershell
         run: |
           kubectl rollout restart deployment/backend-deployment
           kubectl rollout restart deployment/frontend-deployment
@@ -41,6 +47,7 @@ jobs:
           kubectl rollout restart deployment/frontend-deployment -n staging
 
       - name: Wait for rollout
+        shell: powershell
         run: |
           kubectl rollout status deployment/backend-deployment
           kubectl rollout status deployment/frontend-deployment
