@@ -38,20 +38,15 @@ jobs:
           docker push imalka13/dockerized-full-stack-app-frontend:latest
           docker push imalka13/dockerized-full-stack-app-frontend:$env:TAG
 
-      - name: Deploy new version
+      - name: Deploy with Helm
         shell: powershell
         run: |
-          kubectl set image deployment/backend-deployment backend=imalka13/dockerized-full-stack-app:$env:TAG
-          kubectl set image deployment/frontend-deployment frontend=imalka13/dockerized-full-stack-app-frontend:$env:TAG
-
-          kubectl set image deployment/backend-deployment backend=imalka13/dockerized-full-stack-app:$env:TAG -n staging
-          kubectl set image deployment/frontend-deployment frontend=imalka13/dockerized-full-stack-app-frontend:$env:TAG -n staging
+          helm upgrade --install fullstack .\helm\fullstack-app `
+            --set backend.tag=$env:TAG `
+            --set frontend.tag=$env:TAG
 
       - name: Wait for rollout
         shell: powershell
         run: |
           kubectl rollout status deployment/backend-deployment
           kubectl rollout status deployment/frontend-deployment
-
-          kubectl rollout status deployment/backend-deployment -n staging
-          kubectl rollout status deployment/frontend-deployment -n staging
