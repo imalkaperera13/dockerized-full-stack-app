@@ -5,7 +5,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  deploy:
+  deploy-staging:
     runs-on: self-hosted
 
     steps:
@@ -47,6 +47,28 @@ jobs:
             --set backend.tag=$env:TAG `
             --set frontend.tag=$env:TAG
 
+      - name: Wait for staging rollout
+        shell: powershell
+        run: |
+          kubectl rollout status deployment/backend-deployment -n staging
+          kubectl rollout status deployment/frontend-deployment -n staging
+
+  deploy-production:
+    needs: deploy-staging
+    runs-on: self-hosted
+    environment:
+      name: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set image tag
+        shell: powershell
+        run: |
+          $shortSha = "${env:GITHUB_SHA}".Substring(0,7)
+          "TAG=$shortSha" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
       - name: Deploy production with Helm
         shell: powershell
         run: |
@@ -56,10 +78,8 @@ jobs:
             --set backend.tag=$env:TAG `
             --set frontend.tag=$env:TAG
 
-      - name: Wait for rollout
+      - name: Wait for production rollout
         shell: powershell
         run: |
-          kubectl rollout status deployment/backend-deployment -n staging
-          kubectl rollout status deployment/frontend-deployment -n staging
           kubectl rollout status deployment/backend-deployment -n default
           kubectl rollout status deployment/frontend-deployment -n default
