@@ -50,8 +50,8 @@ jobs:
       - name: Wait for staging rollout
         shell: powershell
         run: |
-          kubectl rollout status deployment/backend-deployment -n staging
-          kubectl rollout status deployment/frontend-deployment -n staging
+          kubectl rollout status deployment/backend-deployment -n staging --timeout=120s
+          kubectl rollout status deployment/frontend-deployment -n staging --timeout=120s
 
   deploy-production:
     needs: deploy-staging
@@ -79,7 +79,16 @@ jobs:
             --set frontend.tag=$env:TAG
 
       - name: Wait for production rollout
+        id: rollout
         shell: powershell
         run: |
-          kubectl rollout status deployment/backend-deployment -n default
-          kubectl rollout status deployment/frontend-deployment -n default
+          kubectl rollout status deployment/backend-deployment -n default --timeout=120s
+          kubectl rollout status deployment/frontend-deployment -n default --timeout=120s
+
+      - name: Rollback production on failure
+        if: failure()
+        shell: powershell
+        run: |
+          helm rollback fullstack 1 -n default
+          kubectl rollout status deployment/backend-deployment -n default --timeout=120s
+          kubectl rollout status deployment/frontend-deployment -n default --timeout=120s
