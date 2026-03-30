@@ -1,0 +1,18 @@
+backend:
+  image: imalka13/dockerized-full-stack-app
+  tag: latest
+  replicas: 2
+
+frontend:
+  image: imalka13/dockerized-full-stack-app-frontend
+  tag: latest
+  replicas: 2
+
+mysql:
+  host: db
+  user: root
+  database: devops_app
+  port: 3306
+
+ingress:
+  host: myapp.local
