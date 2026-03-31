@@ -1,5 +1,31 @@
 .env
 node_modules
 backend/node_modules
-docker-data
+docker_data
 *.log
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Kubernetes
+kubeconfig
+*.kubeconfig
+
+# Build
+dist/
+build/
+
+# Database
+*.db
+*.sqlite
+
+# Helm temp
+*.tgz
+
+# Docker
+.docker/

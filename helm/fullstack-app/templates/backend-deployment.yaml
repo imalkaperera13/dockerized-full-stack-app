@@ -3,7 +3,9 @@ kind: Deployment
 metadata:
   name: backend-deployment
 spec:
+  {{- if not .Values.hpa.enabled }}
   replicas: {{ .Values.backend.replicas }}
+  {{- end }}
   selector:
     matchLabels:
       app: backend
@@ -17,6 +19,13 @@ spec:
           image: "{{ .Values.backend.image }}:{{ .Values.backend.tag }}"
           ports:
             - containerPort: 5000
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
           env:
             - name: MYSQL_HOST
               value: "{{ .Values.mysql.host }}"
